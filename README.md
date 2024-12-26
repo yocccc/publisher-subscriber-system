@@ -1,9 +1,14 @@
 # README
 
+## 概要
+publisher-subscriber型の分散システムです。任意の数のpublisher、subscriberは起動するとdirectory serverに接続し、directory serverによって割り振られた任意の数のbrokerの内1つに接続します。
+broker同士リアルタイムで情報を共有しており、publisherが接続されているbrokerに新たにトピックを発行したりメッセージを送信すると、それを購読しているsubscriber全員に届きます。
+
+## USE
 This system supports two connection methods: using a directory service or specifying the connection destination directly. You can switch between these methods using the `-d` and `-b` options.
 
-## Example of Execution Using the Directory Service (`-d` option)
-
+### Example of Execution Using the Directory Service (`-d` option)
+```
 bash
 # Start the directory service
 java -jar directory.jar 9999
@@ -34,3 +39,4 @@ java -jar publisher.jar pub1 localhost:8080
 
 # Start the subscriber and connect it directly to another broker
 java -jar subscriber.jar sub1 localhost:7777
+```
