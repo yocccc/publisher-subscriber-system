@@ -1,4 +1,4 @@
-/** @author Yoshikazu Fujisaka SN:1414141)
+/** @author Yoshikazu Fujisaka
  */
 
 package subscriber;
@@ -14,19 +14,23 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 
 /**
- * MessageReceiverThread is responsible for continuously listening for messages from the broker.
- * It handles broadcast messages, topic deletion notifications, and general responses,
- * and synchronizes with the main thread to notify once a message has been processed.
+ * MessageReceiverThread is responsible for continuously listening for messages
+ * from the broker.
+ * It handles broadcast messages, topic deletion notifications, and general
+ * responses,
+ * and synchronizes with the main thread to notify once a message has been
+ * processed.
  */
 class MessageReceiverThread extends Thread {
     private Socket socket;
     private final Object lock;
 
     /**
-     * Constructor to initialize the message receiver thread with the socket, and lock object.
+     * Constructor to initialize the message receiver thread with the socket, and
+     * lock object.
      *
      * @param socket the Socket connected to the broker
-     * @param lock the object used for synchronizing with the main thread
+     * @param lock   the object used for synchronizing with the main thread
      */
     public MessageReceiverThread(Socket socket, Object lock) {
         this.socket = socket;
@@ -35,7 +39,8 @@ class MessageReceiverThread extends Thread {
 
     /**
      * Continuously listens for incoming messages from the broker.
-     * It processes the message based on its type and notifies the main thread after processing.
+     * It processes the message based on its type and notifies the main thread after
+     * processing.
      */
     @Override
     public void run() {
@@ -70,7 +75,8 @@ class MessageReceiverThread extends Thread {
     }
 
     /**
-     * Handles broadcast messages from the broker, printing out details about the message received.
+     * Handles broadcast messages from the broker, printing out details about the
+     * message received.
      *
      * @param res the JSONObject containing the broadcast message details
      */
@@ -81,13 +87,15 @@ class MessageReceiverThread extends Thread {
         String message = (String) res.get("message");
 
         System.out.println("\nYou have received a message");
-        System.out.println("Publisher: " + publisher + " | Topic ID: " + topicId + " | Title: " + title + " | Message: \"" + message + "\"");
+        System.out.println("Publisher: " + publisher + " | Topic ID: " + topicId + " | Title: " + title
+                + " | Message: \"" + message + "\"");
         System.out.println();
         Subscriber.displayMenu();
     }
 
     /**
-     * Handles delete notifications from the broker, listing the topics that have been deleted.
+     * Handles delete notifications from the broker, listing the topics that have
+     * been deleted.
      *
      * @param res the JSONObject containing the delete notification details
      */
@@ -106,17 +114,21 @@ class MessageReceiverThread extends Thread {
     }
 
     /**
-     * Handles general responses from the broker, including topic listings or response details.
+     * Handles general responses from the broker, including topic listings or
+     * response details.
      *
      * @param res the JSONObject containing the response details
      */
     private void handleGeneralResponse(JSONObject res) {
         Object detail = res.get("detail");
-        String messageType= res.get("message type").toString();
+        String messageType = res.get("message type").toString();
 
         if (detail instanceof JSONArray) {
-            if(messageType.equals("current")) {System.out.println("Subscribed Topics:");}
-            else if(messageType.equals("list")) {System.out.println("Available Topics:");}
+            if (messageType.equals("current")) {
+                System.out.println("Subscribed Topics:");
+            } else if (messageType.equals("list")) {
+                System.out.println("Available Topics:");
+            }
             for (Object item : (JSONArray) detail) {
                 JSONObject jsonObject = (JSONObject) item;
                 String topicId = (String) jsonObject.get("topic id");

@@ -3,6 +3,7 @@ package publisher;
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 import org.json.simple.JSONArray;
@@ -11,9 +12,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * Represents a publisher that interacts with a broker in a publisher-subscriber system.
- * The publisher can create topics, publish messages to topics, show subscriber counts for their topics, and delete topics.
- * It can either connect directly to a broker or use the '-d' option to query a Directory Service for available brokers.
+ * Represents a publisher that interacts with a broker in a publisher-subscriber
+ * system.
+ * The publisher can create topics, publish messages to topics, show subscriber
+ * counts for their topics, and delete topics.
+ * It can either connect directly to a broker or use the '-d' option to query a
+ * Directory Service for available brokers.
  */
 public class Publisher {
     private static final String CREATE = "create";
@@ -26,7 +30,8 @@ public class Publisher {
     private PrintWriter writer;
 
     /**
-     * Constructor to initialize the Publisher with a reader and writer for communication with the broker.
+     * Constructor to initialize the Publisher with a reader and writer for
+     * communication with the broker.
      *
      * @param reader the BufferedReader for reading messages from the broker
      * @param writer the PrintWriter for sending messages to the broker
@@ -38,10 +43,12 @@ public class Publisher {
 
     /**
      * Main method to start the Publisher.
-     * The Publisher can either connect directly to a broker or use the Directory Service to find one.
+     * The Publisher can either connect directly to a broker or use the Directory
+     * Service to find one.
      *
      * @param args Command-line arguments. First argument is the username.
-     *             Use '-d' followed by Directory Service IP and port to query for brokers.
+     *             Use '-d' followed by Directory Service IP and port to query for
+     *             brokers.
      */
     public static void main(String[] args) {
         String brokerIp;
@@ -66,7 +73,8 @@ public class Publisher {
             brokerPort = Integer.parseInt((String) brokerInfo.get("brokerPort"));
             System.out.println("Connecting to broker: " + brokerIp + ":" + brokerPort);
         } else {
-            // Use the broker IP and port specified in the command-line arguments directly to connect to the broker
+            // Use the broker IP and port specified in the command-line arguments directly
+            // to connect to the broker
             String[] address = args[1].split(":");
             brokerIp = address[0];
             brokerPort = Integer.parseInt(address[1]);
@@ -74,11 +82,11 @@ public class Publisher {
         }
 
         try (Socket socket = new Socket(brokerIp, brokerPort);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
 
             Publisher publisher = new Publisher(reader, writer);
-            String userName=args[0];
+            String userName = args[0];
             publisher.sendUserInfo(userName);
             System.out.println("Connected to the broker");
 
@@ -113,7 +121,8 @@ public class Publisher {
     }
 
     /**
-     * Sends user information (user name and type) to the broker when establishing a connection.
+     * Sends user information (user name and type) to the broker when establishing a
+     * connection.
      *
      * @param userName the name of the user (publisher)
      */
@@ -129,7 +138,7 @@ public class Publisher {
      *
      * @param reqString the input command string from the user
      * @return true if the program should continue running, false to exit
-     * @throws IOException if there is an error in communication with the broker
+     * @throws IOException    if there is an error in communication with the broker
      * @throws ParseException if there is an error parsing the broker's response
      */
     private boolean handleCommand(String reqString) throws IOException, ParseException {
@@ -167,8 +176,8 @@ public class Publisher {
      */
     public static JSONArray getBrokers(String directoryIp, int directoryPort) {
         try (Socket socket = new Socket(directoryIp, directoryPort);
-             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-             PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+                PrintWriter writer = new PrintWriter(socket.getOutputStream(), true)) {
 
             JSONObject request = new JSONObject();
             request.put("user type", "publisher");
@@ -190,7 +199,7 @@ public class Publisher {
      * Handles the creation of a new topic.
      *
      * @param req the command input containing the topic ID and name
-     * @throws IOException if there is an error in communication with the broker
+     * @throws IOException    if there is an error in communication with the broker
      * @throws ParseException if there is an error parsing the broker's response
      */
     private void create(String[] req) throws IOException, ParseException {
@@ -200,7 +209,8 @@ public class Publisher {
         }
 
         String topicId = req[1];
-        String topicName = req[2];
+        String topicName = String.join(" ", Arrays.copyOfRange(req, 2, req.length));
+        ;
 
         try {
             Integer.parseInt(topicId);
@@ -226,7 +236,7 @@ public class Publisher {
      * Handles the publishing of a message to an existing topic.
      *
      * @param req the command input containing the topic ID and the message
-     * @throws IOException if there is an error in communication with the broker
+     * @throws IOException    if there is an error in communication with the broker
      * @throws ParseException if there is an error parsing the broker's response
      */
     private void publish(String[] req) throws IOException, ParseException {
@@ -236,7 +246,7 @@ public class Publisher {
         }
 
         String topicId = req[1];
-        String message = req[2];
+        String message = String.join(" ", Arrays.copyOfRange(req, 2, req.length));
 
         try {
             Integer.parseInt(topicId);
@@ -264,9 +274,10 @@ public class Publisher {
     }
 
     /**
-     * Requests and displays the subscriber count for topics owned by the current publisher.
+     * Requests and displays the subscriber count for topics owned by the current
+     * publisher.
      *
-     * @throws IOException if there is an error in communication with the broker
+     * @throws IOException    if there is an error in communication with the broker
      * @throws ParseException if there is an error parsing the broker's response
      */
     private void show() throws IOException, ParseException {
@@ -296,7 +307,7 @@ public class Publisher {
      * Handles the deletion of an existing topic.
      *
      * @param req the command input containing the topic ID to be deleted
-     * @throws IOException if there is an error in communication with the broker
+     * @throws IOException    if there is an error in communication with the broker
      * @throws ParseException if there is an error parsing the broker's response
      */
     private void delete(String[] req) throws IOException, ParseException {

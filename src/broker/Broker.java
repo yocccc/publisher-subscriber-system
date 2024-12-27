@@ -1,4 +1,4 @@
-/** @author Yoshikazu Fujisaka SN:1414141)
+/** @author Yoshikazu Fujisaka)
  */
 
 package broker;
